@@ -1,8 +1,0 @@
-fun is_older (data1 : int * int * int, data2 : int * int * int) =
-
-    return if  then 
-           else 
-               ()#1 data1)
-
-
-if  then 
