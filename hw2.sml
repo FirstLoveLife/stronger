@@ -106,83 +106,71 @@ fun score (cards, goal) =
         score
     end
 
-fun officiate (cards, moves) =
+fun officiate (cards, moves, goal) =
     let
-        fun officiate_helper (heldcards, moves, score, cards) =
-            case moves of
-                [] => score
-              | Discard card => remove_card (heldcards, card)
-              | Draw =>
-                case
+        fun officiate_helper (heldcards, moves, currentscore : int , cards, goal) =
+            let
+                val sum = sum_cards heldcards
+            in
+                if sum > goal
+                then score (heldcards, goal)
+                else
+                    case moves of
+                        [] => score (heldcards, goal)
+                      | (Discard card)::tl => officiate_helper (remove_card (heldcards, card, IllegalMove), tl, sum - card_value (card), cards, goal)
+                      | (Draw)::restmoves =>
+                        case cards of
+                            [] => score (heldcards, goal)
+                          | card::restcards => officiate_helper (card::heldcards, restmoves, currentscore, restcards, goal)
+            end
+
+    in
+        officiate_helper ([], moves, 0, cards, goal)
+    end
+
+fun ace_number (cards) =
+            case cards of
+                [] => 0
+             |  (_, Ace)::tl => 1 + ace_number tl
+             | _::tl => ace_number tl
+
+fun score_challenge (cards, goal) =
+    let
+        val sum1 = sum_cards cards
+        val sum2 = sum_cards cards - (ace_number cards) * 10
+        val prelim1 = if sum1 > goal then 3 * (sum1 - goal) else goal - sum1
+        val prelim2 = if sum2 > goal then 3 * (sum2 - goal) else goal - sum2
+        val score1 = if all_same_color cards then prelim1 div 2 else prelim1
+        val score2 = if all_same_color cards then prelim2 div 2 else prelim2
+        val score = if score1 < score2 then score1 else score2
+    in
+        score
+    end
+
+fun officiate_challenge (cards, moves, goal) =
+    let
+        fun officiate_helper (heldcards, moves, currentscore : int , cards, goal) =
+            let
+                val sum = sum_cards heldcards
+            in
+                if sum > goal
+                then score_challenge (heldcards, goal)
+                else
+                    case moves of
+                        [] => score_challenge (heldcards, goal)
+                      | (Discard card)::tl => officiate_helper (remove_card (heldcards, card, IllegalMove), tl, sum - card_value (card), cards, goal)
+                      | (Draw)::restmoves =>
+                        case cards of
+                            [] => score_challenge (heldcards, goal)
+                          | card::restcards => officiate_helper (card::heldcards, restmoves, currentscore, restcards, goal)
+            end
+
+    in
+        officiate_helper ([], moves, 0, cards, goal)
+    end
 
 (* Homework2 Simple Test *)
 (* These are basic test cases. Passing these tests does not guarantee that your code will pass the actual homework grader *)
 (* To run the test, add a new line to the top of this file: use "homeworkname.sml"; *)
 (* All the tests should evaluate to true. For example, the REPL should say: val test1 = true : bool *)
 
-val test1 = all_except_option ("string", ["string"]) = SOME []
-val test11 = all_except_option ("string", ["string", "apple"]) = SOME ["apple"]
-val test1111 = all_except_option ("string", ["str"]) = NONE
-val test11111 = all_except_option ("string", ["string", "banana", "apple"]) = SOME ["banana", "apple"]
-
-val test2 = get_substitutions1 ([["foo"],["there"]], "foo") = []
-val test22 = get_substitutions1 ([["foo", "bbb"],["there"]], "foo") = ["bbb"]
-val test222 = get_substitutions1 ([["foo"],["there", "ttt"]], "foo") = []
-val test2222 = get_substitutions1 ([["aaa", "bbb", "foo", "eee"],["there"]], "foo") = ["aaa", "bbb", "eee"
- val test3 = get_substitutions2 ([["foo"],["there"]], "foo") = []
-val test33 = get_substitutions2 ([["foo", "bbb"],["there"]], "foo") = ["bbb"]
-val test333 = get_substitutions2 ([["foo"],["there", "ttt"]], "foo") = []
-val test3333 = get_substitutions2 ([["aaa", "bbb", "foo", "eee"],["there"]], "foo") = ["aaa", "bbb", "eee"]
-
-val test4 = similar_names ([["Fred","Fredrick"],["Elizabeth","Betty"],["Freddie","Fred","F"]], {first="Fred", middle="W", last="Smith"}) =
-	    [{first="Fred", last="Smith", middle="W"}, {first="Fredrick", last="Smith", middle="W"},
-	     {first="Freddie", last="Smith", middle="W"}, {first="F", last="Smith", middle="W"}]
-
-
-val test5 = card_color (Clubs, Num 2) = Black
-val test55 = card_color (Spades, Num 2) = Black
-
-val test555 = card_color (Hearts, Num 2) = Red
-val test5555 = card_color (Diamonds, Num 2) = Red
-val test66 = card_value (Clubs, Num 2) = 2
-val test666 = card_value (Clubs, Ace) = 11
-val test6 = card_value (Clubs, Num 10) = 10
-val test6666 = card_value (Clubs, Jack) = 10
-
-val test7 = remove_card ([(Hearts, Ace)], (Hearts, Ace), IllegalMove) = []
-val test77 = remove_card ([(Hearts, Ace), (Hearts, Ace), (Diamonds, Num 4)], (Hearts, Ace), IllegalMove) = [(Hearts, Ace), (Diamonds, Num 4)]
-val test777 = remove_card ([(Clubs, Jack), (Hearts, Ace)], (Hearts, Ace), IllegalMove) = [(Clubs, Jack)]
-val test7777 = remove_card ([(Hearts, Ace)], (Hearts, Ace), IllegalMove) = []
-
-val test8 = all_same_color [(Hearts, Ace), (Hearts, Ace)] = true
-val test88 = all_same_color [(Hearts, Jack), (Hearts, Ace)] = true
-val test88888 = all_same_color [(Spades, Jack), (Clubs, Ace)] = true
-val test888888 = all_same_color [(Hearts, Jack), (Diamonds, Ace)] = true
-val test888 = all_same_color [(Clubs, Num 10), (Hearts, Ace)] = false
-val test8888 = all_same_color [(Hearts, Ace), (Spades, Num 2)] = false
-
-val test9 = sum_cards [(Clubs, Num 2),(Clubs, Num 2)] = 4
-val test99 = sum_cards [(Clubs, Num 2),(Clubs, Ace)] = 13
-val test999 = sum_cards [(Clubs, Num 2),(Clubs, Jack)] = 12
-val test9999 = sum_cards [(Clubs, Num 2),(Clubs, Num 9)] = 11
-
-val test10 = score ([(Hearts, Num 2),(Clubs, Num 4)],10) = 4
-val test100 = score ([(Hearts, Num 2),(Clubs, Num 4)],6) = 0
-val test1000 = score ([(Hearts, Num 2),(Hearts, Num 4)],10) = 2
-val test10000 = score ([(Hearts, Num 2),(Clubs, Num 10)],10) = 6
-
-
-
-
-val test11 = officiate ([(Hearts, Num 2),(Clubs, Num 4)],[Draw], 15) = 6
-
-val test12 = officiate ([(Clubs,Ace),(Spades,Ace),(Clubs,Ace),(Spades,Ace)],
-                        [Draw,Draw,Draw,Draw,Draw],
-                        42)
-             = 3
-
-val test13 = ((officiate([(Clubs,Jack),(Spades,Num(8))],
-                         [Draw,Discard(Hearts,Jack)],
-                         42);
-               false)
-              handle IllegalMove => true)

@@ -110,7 +110,7 @@ fun dates_in_months_challenge (dates : (int * int * int) list, months : int list
     dates_in_months (dates, remove_duplicates (months))
 
 fun reasonable_date (year : int, month : int, day : int) =
-    if (month > 12 orelse month < 1 orelse day < 1 orelse day > 31 year < 1)
+    if (month > 12 orelse month < 1 orelse day < 1 orelse day > 31 orelse year < 1)
     then false
     else
         let
