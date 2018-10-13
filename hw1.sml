@@ -115,7 +115,7 @@ fun reasonable_date (year : int, month : int, day : int) =
     else
         let
             val monthOfNonLeap = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-            val monthOfLeap = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
             fun leap (year : int) =
                 (year mod 400) = 0 orelse (year mod 4 = 0 andalso year mod 100 <> 0)
         in
