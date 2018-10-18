@@ -41,12 +41,12 @@ fun all_answers f list =
             NONE => NONE
           | SOME list1  =>
             case all_answers f tl of
-              NONE => NONE
-                   | SOME list2 => SOME (list1@list2)
+                NONE => NONE
+              | SOME list2 => SOME (list1@list2)
 
 datatype pattern =
          Wildcard
-		 | Variable of string
+  		 | Variable of string
 		 | UnitP
 		 | ConstP of int
 		 | TupleP of pattern list
@@ -118,23 +118,26 @@ fun first_match variable patternList =
 (* for the challenge problem only *)
 
 datatype typ = Anything
-	     | UnitT
-	     | IntT
-	     | TupleT of typ list
-	     | Datatype of string
+	         | UnitT
+	         | IntT
+	         | TupleT of typ list
+	         | Datatype of string
 
-(* Homework3 Simple Test *)
-(* These are basic test cases. Passing these tests does not guarantee that your code will pass the actual homework grader *)
-(* To run the test, add a new line to the top of this file: use "homeworkname.sml"; *)
-(* All the tests should evaluate to true. For example, the REPL should say: val test1 = true : bool *)
+fun type_patterns ctors patterns =
+    let
+    fun type_patterns_helper ctors patterns ans =
+        case patterns of
+            [] => NONE
+          | pattern::tl =>
+            let
+            val a = 1
+            in
+            end
+    in
+    end
 
-val test11 = only_capitals ["A","B","C"] = ["A","B","C"]
-val test1 = only_capitals ["a","b","c"] = []
+   
 
-val test20 = longest_string1 [] = ""
-val test2 = longest_string1 ["A","bc","C"] = "bc"
-val test22 = longest_string1 ["hahaha", "A","bc","C"] = "hahaha"
-val test222= longest_string1 ["A","bc","C", "hahaha"] = "hahaha"
 val test2222 = longest_string1 ["A","bc", "ef", "C"] = "bc"
 
 val test33 = longest_string2 ["A","bc","C"] = "bc"

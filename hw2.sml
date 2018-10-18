@@ -147,6 +147,7 @@ fun score_challenge (cards, goal) =
         score
     end
 
+(*didn't pass this challenge problem*)
 fun officiate_challenge (cards, moves, goal) =
     let
         fun officiate_helper (heldcards, moves, currentscore : int , cards, goal) =
