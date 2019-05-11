@@ -123,16 +123,19 @@ datatype typ = Anything
 	         | TupleT of typ list
 	         | Datatype of string
 
-fun type_patterns ctors patterns =
+fun typecheck_patterns ctors patterns =
     let
     fun type_patterns_helper ctors patterns ans =
         case patterns of
             [] => NONE
           | pattern::tl =>
-            let
-            val a = 1
-            in
-            end
+            case pattern of
+                let
+                val next = type_patterns_helper ctors tl ans
+                in
+
+                end
+
     in
     end
 
